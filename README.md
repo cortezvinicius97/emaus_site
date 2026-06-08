@@ -44,6 +44,12 @@ npm run build
 ## Utilitários
 
 ```bash
+# Criar um novo usuário admin
+php artisan user:create
+
+# Criar passando valores diretamente
+php artisan user:create "Nome" "email@email.com" "senha"
+
 # Atualizar email e/ou senha do usuário admin
 php artisan user:update
 
