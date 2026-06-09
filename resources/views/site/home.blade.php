@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Grupo de Jovens Emaús – Grupo de Jovens Católico')
+@section('title', 'Grupo de Jovens Emaús | Paróquia NS da Guia')
 
 @section('content')
 <header id="header">
@@ -37,7 +37,7 @@
             <a href="#contato" class="btn btn-outline">Participe</a>
         </div> --}}
     </div>
-    <div class="scroll-indicator">
+    <div class="scroll-indicator" id="scrollDown" style="cursor:pointer;">
         <span></span>
     </div>
 </section>
@@ -185,38 +185,80 @@
 </section>
 
 <section id="versiculo" class="versiculo-section">
-    <div class="container versiculo-container">
+    <div class="container">
         <div class="section-header" style="margin-bottom:2.5rem;">
             <span class="section-tag">Palavra de Deus</span>
-            <h2 class="section-title" style="color:#fff;">Liturgia Diária</h2>
-            <div class="divider" style="background:linear-gradient(to right, var(--dourado), var(--branco));"></div>
+            <h2 class="section-title">Liturgia Diária</h2>
+            <div class="divider"></div>
         </div>
-        <div class="versiculo-icon">✝</div>
-        @if($reading)
-            <div style="max-width:760px;margin:0 auto;">
-                <div style="margin-bottom:2rem;">
-                    <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Primeira Leitura</h4>
-                    <blockquote class="versiculo-text">{{ $reading->first_reading_text }}</blockquote>
-                    @if($reading->first_reading_ref)
-                        <cite class="versiculo-ref">— {{ $reading->first_reading_ref }}</cite>
+        <div class="liturgia-card @if($reading && $reading->cor) cor-{{ strtolower($reading->cor) }} @endif">
+            <div class="versiculo-icon">✝</div>
+            @if($reading && $reading->liturgia)
+                <p style="font-size:0.85rem;color:var(--dourado);margin-bottom:1.5rem;font-weight:600;text-align:center;">{{ $reading->liturgia }}</p>
+            @endif
+            @if($reading)
+                <div style="max-width:760px;margin:0 auto;">
+                    <div style="margin-bottom:2rem;">
+                        <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Primeira Leitura</h4>
+                        @if($reading->first_reading_title)
+                            <p style="color:var(--dourado);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">{{ $reading->first_reading_title }}</p>
+                        @endif
+                        <blockquote class="versiculo-text">@verses(e($reading->first_reading_text))</blockquote>
+                        @if($reading->first_reading_ref)
+                            <cite class="versiculo-ref">— {{ $reading->first_reading_ref }}</cite>
+                        @endif
+                    </div>
+                    @if($reading->second_reading_text)
+                    <div style="margin-bottom:2rem;">
+                        <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Segunda Leitura</h4>
+                        @if($reading->second_reading_title)
+                            <p style="color:var(--dourado);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">{{ $reading->second_reading_title }}</p>
+                        @endif
+                        <blockquote class="versiculo-text">@verses(e($reading->second_reading_text))</blockquote>
+                        @if($reading->second_reading_ref)
+                            <cite class="versiculo-ref">— {{ $reading->second_reading_ref }}</cite>
+                        @endif
+                    </div>
+                    @endif
+                    @if($reading->psalm_text || $reading->psalm_refrao)
+                    <div style="margin-bottom:2rem;">
+                        <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Salmo de Resposta</h4>
+                        @if($reading->psalm_title)
+                            <p style="color:var(--dourado);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">{{ $reading->psalm_title }}</p>
+                        @endif
+                        @if($reading->psalm_refrao)
+                            <p style="font-size:0.85rem;color:var(--dourado);font-weight:600;margin-bottom:0.75rem;">R: {{ $reading->psalm_refrao }}</p>
+                        @endif
+                        @if($reading->psalm_verses)
+                            <blockquote class="versiculo-text" style="font-size:0.9rem;">@verses(nl2br(e($reading->psalm_verses)))</blockquote>
+                        @elseif($reading->psalm_text)
+                            <blockquote class="versiculo-text">@verses(e($reading->psalm_text))</blockquote>
+                        @endif
+                        @if($reading->psalm_ref)
+                            <cite class="versiculo-ref">— {{ $reading->psalm_ref }}</cite>
+                        @endif
+                    </div>
+                    @endif
+                    @if($reading->evangelho_text)
+                    <div>
+                        <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Evangelho</h4>
+                        @if($reading->evangelho_title)
+                            <p style="color:var(--dourado);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">{{ $reading->evangelho_title }}</p>
+                        @endif
+                        <blockquote class="versiculo-text">@verses(e($reading->evangelho_text))</blockquote>
+                        @if($reading->evangelho_ref)
+                            <cite class="versiculo-ref">— {{ $reading->evangelho_ref }}</cite>
+                        @endif
+                    </div>
                     @endif
                 </div>
-                @if($reading->second_reading_text)
-                <div>
-                    <h4 style="font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;font-weight:700;">Segunda Leitura</h4>
-                    <blockquote class="versiculo-text">{{ $reading->second_reading_text }}</blockquote>
-                    @if($reading->second_reading_ref)
-                        <cite class="versiculo-ref">— {{ $reading->second_reading_ref }}</cite>
-                    @endif
-                </div>
-                @endif
-            </div>
-        @else
-            <blockquote class="versiculo-text">
-                "Porque sou eu que conheço os planos que tenho para vocês, diz o Senhor, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro."
-            </blockquote>
-            <cite class="versiculo-ref">— Jeremias 29,11</cite>
-        @endif
+            @else
+                <blockquote class="versiculo-text" style="text-align:center;">
+                    "Porque sou eu que conheço os planos que tenho para vocês, diz o Senhor, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro."
+                </blockquote>
+                <cite class="versiculo-ref" style="display:block;text-align:center;">— Jeremias 29,11</cite>
+            @endif
+        </div>
     </div>
 </section>
 
@@ -296,6 +338,7 @@
         </div>
         <p class="footer-verse">"A fé sem obras é morta." — Tiago 2,26</p>
         <p class="footer-copy">© {{ date('Y') }} Grupo de Jovens Emaús · Todos os direitos reservados</p>
+        <p style="margin-top:0.5rem;font-size:0.8rem;"><a href="{{ route('privacy') }}" style="color:rgba(255,255,255,0.5);text-decoration:none;">Política de Privacidade</a></p>
     </div>
 </footer>
 

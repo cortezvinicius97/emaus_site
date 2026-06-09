@@ -28,10 +28,12 @@ window.addEventListener('scroll', () => {
     header.classList.remove('scrolled');
   }
 
-  if (scrollY > 400) {
-    backToTop.classList.add('visible');
-  } else {
-    backToTop.classList.remove('visible');
+  if (backToTop) {
+    if (scrollY > 400) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
   }
 
   highlightNavLink();
@@ -157,49 +159,91 @@ document.querySelectorAll('.galeria-item').forEach((item, i) => {
 // ---- FORMULÁRIO: validação ----
 const form = document.getElementById('contato-form');
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  let valid = true;
+if (form) {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
 
-  const campos = [
-    { id: 'nome', errId: 'erro-nome', msg: 'Por favor, informe seu nome.' },
-    { id: 'email', errId: 'erro-email', msg: 'Por favor, informe um e-mail válido.' },
-    { id: 'mensagem', errId: 'erro-mensagem', msg: 'Por favor, escreva sua mensagem.' },
-  ];
+    const campos = [
+      { id: 'nome', errId: 'erro-nome', msg: 'Por favor, informe seu nome.' },
+      { id: 'email', errId: 'erro-email', msg: 'Por favor, informe um e-mail válido.' },
+      { id: 'mensagem', errId: 'erro-mensagem', msg: 'Por favor, escreva sua mensagem.' },
+    ];
 
-  campos.forEach(({ id, errId, msg }) => {
-    const el = document.getElementById(id);
-    const err = document.getElementById(errId);
-    const val = el.value.trim();
-    let ok = val.length > 0;
+    campos.forEach(({ id, errId, msg }) => {
+      const el = document.getElementById(id);
+      const err = document.getElementById(errId);
+      const val = el.value.trim();
+      let ok = val.length > 0;
 
-    if (id === 'email') {
-      ok = ok && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    }
+      if (id === 'email') {
+        ok = ok && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      }
 
-    if (!ok) {
-      el.classList.add('invalid');
-      err.textContent = msg;
-      valid = false;
-    } else {
-      el.classList.remove('invalid');
-      err.textContent = '';
+      if (!ok) {
+        el.classList.add('invalid');
+        err.textContent = msg;
+        valid = false;
+      } else {
+        el.classList.remove('invalid');
+        err.textContent = '';
+      }
+    });
+
+    if (valid) {
+      const successEl = document.getElementById('form-success');
+      successEl.textContent = '✓ Mensagem enviada! Entraremos em contato em breve.';
+      form.reset();
+      setTimeout(() => { successEl.textContent = ''; }, 5000);
     }
   });
 
-  if (valid) {
-    const successEl = document.getElementById('form-success');
-    successEl.textContent = '✓ Mensagem enviada! Entraremos em contato em breve.';
-    form.reset();
-    setTimeout(() => { successEl.textContent = ''; }, 5000);
+  // Limpa erros ao digitar
+  form.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.remove('invalid');
+      const errEl = document.getElementById('erro-' + el.id);
+      if (errEl) errEl.textContent = '';
+    });
+  });
+}
+
+document.addEventListener('click', function(e) {
+  const target = e.target.closest('#scrollDown');
+  if (!target) return;
+  const hero = target.closest('.hero');
+  const next = hero ? hero.nextElementSibling : null;
+  if (next) {
+    next.scrollIntoView({ behavior: 'smooth' });
   }
 });
 
-// Limpa erros ao digitar
-form.querySelectorAll('input, textarea').forEach(el => {
-  el.addEventListener('input', () => {
-    el.classList.remove('invalid');
-    const errEl = document.getElementById('erro-' + el.id);
-    if (errEl) errEl.textContent = '';
+// ---- DEBUG: seletor de data para testar cores litúrgicas ----
+(function() {
+  const dbg = document.getElementById('debug-toggle');
+  const panel = document.getElementById('debug-panel');
+  if (!dbg || !panel) return;
+
+  dbg.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.toggle('show');
   });
-});
+
+  document.addEventListener('click', function() {
+    panel.classList.remove('show');
+  });
+  panel.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+
+  document.getElementById('debug-go').addEventListener('click', function() {
+    const val = document.getElementById('debug-date').value;
+    if (val) {
+      window.location.href = '?data=' + val;
+    }
+  });
+
+  document.getElementById('debug-today').addEventListener('click', function() {
+    window.location.href = '/';
+  });
+})();
