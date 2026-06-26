@@ -269,16 +269,15 @@
             <h2 class="section-title">Galeria</h2>
             <div class="divider"></div>
         </div>
-        <div class="galeria-grid">
-            @php $colors = ['#1a3a5c', '#2d1b4e', '#1a4a2e', '#4a1a1a', '#3a2a0a', '#0a3a3a']; @endphp
+        <div class="galeria-grid" id="galeria-grid">
             @forelse($galleries as $gallery)
-                @foreach($gallery->photos as $photo)
-                    @php $colorIndex = ($loop->parent->index * 10 + $loop->index) % count($colors); @endphp
-                    <div class="galeria-item" style="--bg: {{ $colors[$colorIndex] }}">
-                        <img src="{{ asset('storage/' . $photo->file_path) }}" alt="{{ $photo->caption ?? $gallery->title }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
-                        <div class="galeria-overlay"><span>{{ $photo->caption ?? $gallery->title }}</span></div>
-                    </div>
-                @endforeach
+                @php $first = $gallery->photos->first(); @endphp
+                @if($first)
+                <div class="galeria-item" data-photos='@json($gallery->photos->map(fn($p) => ["path" => $p->file_path, "caption" => $p->caption ?? ""]))' style="--bg: #1a3a5c;cursor:pointer;">
+                    <img src="{{ asset('storage/' . $first->file_path) }}" alt="{{ $first->caption ?? $gallery->title }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+                    <div class="galeria-overlay"><span>{{ $gallery->title }} ({{ $gallery->photos->count() }})</span></div>
+                </div>
+                @endif
             @empty
                 <div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:#94a3b8;">
                     <div style="font-size:3rem;margin-bottom:0.5rem;">📸</div>
@@ -286,6 +285,68 @@
                 </div>
             @endforelse
         </div>
+
+        <div id="galeria-modal" class="galeria-modal" style="display:none;">
+            <span class="galeria-modal-close">&times;</span>
+            <button class="galeria-modal-prev">&#10094;</button>
+            <button class="galeria-modal-next">&#10095;</button>
+            <div class="galeria-modal-content">
+                <img id="galeria-modal-img" src="" alt="">
+                <p id="galeria-modal-caption"></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('galeria-modal');
+    const modalImg = document.getElementById('galeria-modal-img');
+    const modalCaption = document.getElementById('galeria-modal-caption');
+    const closeBtn = modal.querySelector('.galeria-modal-close');
+    const prevBtn = modal.querySelector('.galeria-modal-prev');
+    const nextBtn = modal.querySelector('.galeria-modal-next');
+
+    let photos = [];
+    let index = 0;
+
+    function open(idx) {
+        index = idx;
+        const p = photos[index];
+        modalImg.src = '{{ asset("storage") }}/' + p.path;
+        modalCaption.textContent = p.caption || '';
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('galeria-grid').addEventListener('click', function(e) {
+        const item = e.target.closest('.galeria-item');
+        if (!item) return;
+        try { photos = JSON.parse(item.dataset.photos); } catch(e) { return; }
+        if (!photos.length) return;
+        open(0);
+    });
+
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', function(e) { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function(e) {
+        if (modal.style.display !== 'flex') return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') prev();
+        if (e.key === 'ArrowRight') next();
+    });
+
+    function prev() { index = (index - 1 + photos.length) % photos.length; open(index); }
+    function next() { index = (index + 1) % photos.length; open(index); }
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+});
+</script>
     </div>
 </section>
 

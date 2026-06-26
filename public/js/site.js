@@ -129,33 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.head.insertAdjacentHTML('beforeend', `<style>.visible{opacity:1!important;transform:none!important;}</style>`);
 });
 
-// ---- GALERIA: lightbox simples ----
-document.querySelectorAll('.galeria-item').forEach((item, i) => {
-  item.addEventListener('click', () => {
-    const label = item.querySelector('.galeria-overlay span')?.textContent || 'Foto';
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position:fixed; inset:0; background:rgba(0,0,0,0.88);
-      display:flex; align-items:center; justify-content:center;
-      z-index:9999; cursor:pointer; flex-direction:column; gap:1rem;
-    `;
-    overlay.innerHTML = `
-      <div style="
-        width:min(90vw,500px); height:300px;
-        background: linear-gradient(135deg, ${getComputedStyle(item).backgroundColor}, #000a);
-        border-radius:12px; display:flex; align-items:center; justify-content:center;
-        font-size:4rem; color:rgba(255,255,255,0.2); font-family:'Cinzel',serif;
-      ">✝</div>
-      <p style="color:#fff; font-family:'Lato',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;">
-        ${label}
-      </p>
-      <p style="color:rgba(255,255,255,0.45); font-size:0.8rem;">Clique para fechar</p>
-    `;
-    overlay.addEventListener('click', () => overlay.remove());
-    document.body.appendChild(overlay);
-  });
-});
-
 // ---- FORMULÁRIO: validação ----
 const form = document.getElementById('contato-form');
 

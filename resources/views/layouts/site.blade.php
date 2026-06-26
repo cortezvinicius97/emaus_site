@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
+    <meta property="og:image" content="{{ asset('og_image.jpg') }}">
+    <meta property="og:title" content="@yield('title', 'Grupo de Jovens Emaús | Paróquia NS da Guia')">
+    <meta property="og:description" content="Grupo de Jovens Emaús - Paróquia Nossa Senhora da Guia">
     @stack('styles')
 </head>
 <body>
